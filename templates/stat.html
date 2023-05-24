@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика пользователя {{ user.username }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h3 class="my-4">Статистика пользователя {{ user.username }}</h3>
+        <dl class="row">
+            <dt class="col-sm-3">Правильных ответов</dt>
+            <dd class="col-sm-9">{{ user.correct_answers }}
+                ({{ (user.correct_answers / user.questions | length * 100) | round }} %)
+            </dd>
+
+            <dt class="col-sm-3">Неправильных ответов</dt>
+            <dd class="col-sm-9">{{ user.questions | length - user.correct_answers }}</dd>
+        </dl>
+        <h6 class="my-4">Таблица ответов:</h6>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Слово</th>
+                <th scope="col">Перевод</th>
+                <th scope="col">Результат</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for question, result in user.answers %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td>{{ question.question }}</td>
+                    <td>{{ question.answer }}</td>
+                    {% if result %}
+                        <td class="text-success">Правильно</td>
+                    {% else %}
+                        <td class="text-danger">Неправильно</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    <a class="btn btn-primary" href="/" role="button">На главную</a>
+    </div>
+
+
+
+{% endblock %}

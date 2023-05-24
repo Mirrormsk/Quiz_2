@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    English Quiz - проверь свои знания английского
+{% endblock %}
+
+{% block body %}
+    <div class="container my-5">
+        <div class="row p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
+            <div class="col-lg-7 p-3 p-lg-5 pt-lg-3">
+                <h1 class="display-4 fw-bold lh-1 text-body-emphasis">Викторина английских слов</h1>
+                <p class="lead">Проверь свои знания английского, выучи новые слова, и просто развлекись</p>
+                <div class="d-flex flex-column align-items-start mb-4 mb-lg-3">
+                    <h5>Выберете уровень сложности</h5>
+                    <form action="/" method="POST" id="user_answer">
+                        <select class="form-select form-select-lg mb-3 d-block gap-2"
+                                aria-label="form-select-lg example" name="diff_level">
+                            <option value="1" selected>Легкий</option>
+                            <option value="2">Средний</option>
+                            <option value="3">Сложный</option>
+                        </select>
+                        <input type="text" class="form-control" aria-label="Username" placeholder="Имя пользователя"
+                               name="username"><br>
+{#                        <button class="btn btn-primary" type="submit">Подтвердить</button>#}
+                        <button type="submit" class="btn btn-success btn-lg px-4 me-md-2 fw-bold mt-3">Начать викторину
+                    </button>
+                    </form>
+                    <br>
+
+                </div>
+            </div>
+            <div class="col-lg-4 p-0 overflow-hidden">
+                <img class="rounded-lg-3 img-fluid d-block" src="{{ url_for('static', filename='img/words.jpg') }}"
+                     alt=""
+                     width="640" content="">
+            </div>
+        </div>
+    </div>
+{% endblock %}

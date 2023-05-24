@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block headeer_script %}
+    <script src="{{ url_for('static', filename='js/check_answer.js') }} "></script>
+{% endblock %}
+{% block title %}Quiz - Вопрос {{ user.current_answer_number + 1 }} из {{ user.questions | length }} {% endblock %}
+
+
+{% block body %}
+    <div class="user_id_div" id="{{ user.user_id }}"></div>
+    <div class="px-4 py-5 my-5 text-center">
+        {#    <img class="d-block mx-auto mb-4" src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">#}
+        <h1 class="display-5 fw-bold">{{ question.question }}</h1><br>
+        <p>{{ answer_length }}, первая - "{{ question.answer[0] }}"</p>
+        <br>
+        <div class="col-lg-6 mx-auto">
+            <form id="user_answer_form">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Как переводится это слово?"
+                           aria-describedby="button-addon2" name="user_answer" id="user_answer">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Ответить</button>
+                </div>
+            </form>
+            <div class="card invisible" id="result_card">
+                <div class="card-header">
+                    Ваш результат
+                </div>
+                <div class="card-body" id="result_card_body">
+                    <h5 class="card-title" id="result_title">Special title treatment</h5>
+                    <p class="card-text">{{ question.question.capitalize() }} - это {{ question.answer }}</p>
+                    {% if user.current_answer_number + 1 != user.questions | length %}
+                        <a href="/quiz/{{ user.user_id }}" id="next_question" class="btn btn-primary">Следующий вопрос</a>
+                    {% else %}
+                        <a href="/quiz/{{ user.user_id }}" id="next_question" class="btn btn-primary">Закончить викторину</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <div class="container my-5 justify-content-center d-flex">
+            <div class="progress w-50" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0"
+                 aria-valuemax="100">
+                <div class="progress-bar"
+                     style="width: {{ progress_percent }}%"></div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
