@@ -89,7 +89,7 @@ def check_answer():
     session_answers = session.get_answers_list()
     session_answers.append((question, is_answer_correct))
     session.set_answers_list(session_answers)
-    print(session_answers)
+
     session.current_answer_num += 1
     db.session.commit()
 
@@ -112,9 +112,9 @@ def stat(id):  # Страница статистики
         return f'Пользователь с id {id} не найден'
 
     results = session.get_answers_list()
-    print(results)
     correct_answers = len([res for qst, res in results if res])
     incorrect_answers = len(results) - correct_answers
+    print(f'Пользователь {user.username}: правильных {correct_answers}, неправильных {incorrect_answers}')
     return render_template('stat.html', user=user, correct_answers=correct_answers, incorrect_answers=incorrect_answers,
                            results=results, user_id=user.id)
 
