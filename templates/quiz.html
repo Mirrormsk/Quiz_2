@@ -2,11 +2,11 @@
 {% block headeer_script %}
     <script src="{{ url_for('static', filename='js/check_answer.js') }} "></script>
 {% endblock %}
-{% block title %}Quiz - Вопрос {{ user.current_answer_number + 1 }} из {{ user.questions | length }} {% endblock %}
+{% block title %}Quiz - Вопрос {{ user_session.current_answer_num + 1 }} из {{ user_session.questions | length }} {% endblock %}
 
 
 {% block body %}
-    <div class="user_id_div" id="{{ user.user_id }}"></div>
+    <div class="user_id_div" id="{{ user_id }}">ID: {{ user_id }}</div>
     <div class="px-4 py-5 my-5 text-center">
         {#    <img class="d-block mx-auto mb-4" src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">#}
         <h1 class="display-5 fw-bold">{{ question.question }}</h1><br>
@@ -27,10 +27,10 @@
                 <div class="card-body" id="result_card_body">
                     <h5 class="card-title" id="result_title">Special title treatment</h5>
                     <p class="card-text">{{ question.question.capitalize() }} - это {{ question.answer }}</p>
-                    {% if user.current_answer_number + 1 != user.questions | length %}
-                        <a href="/quiz/{{ user.user_id }}" id="next_question" class="btn btn-primary">Следующий вопрос</a>
+                    {% if user_session.current_answer_num + 1 != user_session.questions | length %}
+                        <a href="/quiz/{{ user.id }}" id="next_question" class="btn btn-primary">Следующий вопрос</a>
                     {% else %}
-                        <a href="/quiz/{{ user.user_id }}" id="next_question" class="btn btn-primary">Закончить викторину</a>
+                        <a href="/quiz/{{ user.id }}" id="next_question" class="btn btn-primary">Закончить викторину</a>
                     {% endif %}
 
                 </div>

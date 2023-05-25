@@ -1,5 +1,6 @@
+import random
 from random import shuffle, sample
-from models.models import Question
+from models.models_db import Question, User
 
 
 def get_random_id() -> int:
@@ -11,17 +12,30 @@ def get_random_id() -> int:
     return int(''.join(digits))
 
 
-def create_questions(questions: dict[str, str], qst_number=10) -> list[Question]:
+#
+# def create_questions(questions: dict[str, str], qst_number=10) -> list[Question]:
+#     """
+#     Принимает на вход словарь с вопросами, и возвращает
+#     объект Question
+#     :param qst_number:
+#     :param questions:
+#     :return:
+#     """
+#     words = sample(list(questions.keys()), qst_number)
+#     user_questions = [Question(word, questions[word].split(',')[0]) for word in words]
+#     return user_questions
+
+
+def create_questions(diff_level: int, k: int = 10):
     """
-    Принимает на вход словарь с вопросами, и возвращает
-    объект Question
-    :param qst_number:
-    :param questions:
-    :return:
+    Функция для генерации списка вопросов
+    :type k: int  - размер возвращаемого списка
+    :param diff_level: принимает уровень сложности в виде int
+    :return: возвращает список объектов класса Question
     """
-    words = sample(list(questions.keys()), qst_number)
-    user_questions = [Question(word, questions[word].split(',')[0]) for word in words]
-    return user_questions
+    questions_all = Question.query.filter_by(level=diff_level).all()
+    questions = random.sample(questions_all, k)
+    return questions
 
 
 def choose_plural(amount: int, declensions: tuple) -> str:
@@ -36,3 +50,23 @@ def choose_plural(amount: int, declensions: tuple) -> str:
     else:
         res = declensions[2]
     return f'{amount} {res}'
+
+
+def get_user_and_session(id_):
+    """
+    Возвращает объект юзера и последнюю сессию
+    :param id_: int
+    :return:
+    todo: оформить аннотации типов
+    """
+    user = User.query.get(id_)
+    if user:
+        sorted_sessions = sorted(user.sessions, key=lambda session: session.id,
+                                 reverse=True)  # Сортировка сессий по полю 'id' в порядке убывания
+        if sorted_sessions:
+            session = sorted_sessions[0]  # Получение последней сессии
+            # Обработка последней сессии
+        else:
+            return f'У пользователя {User} пока нет сессий'
+    else:
+        return f'Пользователь с id {id_} не найден'

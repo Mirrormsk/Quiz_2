@@ -1,4 +1,77 @@
+from models.models_db import Question
+from config.app_config import db, app
+
 easy = {
+    'hello': 'привет',
+    'goodbye': 'до свидания',
+    'thank you': 'спасибо',
+    'yes': 'да',
+    'no': 'нет',
+    'please': 'пожалуйста',
+    'sorry': 'извините',
+    'excuse me': 'извините',
+    'help': 'помощь',
+    'time': 'время',
+    'day': 'день',
+    'night': 'ночь',
+    'morning': 'утро',
+    'afternoon': 'день',
+    'evening': 'вечер',
+    'today': 'сегодня',
+    'tomorrow': 'завтра',
+    'yesterday': 'вчера',
+    'week': 'неделя',
+    'month': 'месяц',
+    'year': 'год',
+    'number': 'число',
+    'one': 'один',
+    'two': 'два',
+    'three': 'три',
+    'four': 'четыре',
+    'five': 'пять',
+    'six': 'шесть',
+    'seven': 'семь',
+    'eight': 'восемь',
+    'nine': 'девять',
+    'ten': 'десять',
+    'red': 'красный',
+    'blue': 'синий',
+    'green': 'зеленый',
+    'yellow': 'желтый',
+    'black': 'черный',
+    'white': 'белый',
+    'big': 'большой',
+    'small': 'маленький',
+    'hot': 'горячий',
+    'cold': 'холодный',
+    'happy': 'счастливый',
+    'sad': 'грустный',
+    'angry': 'сердитый',
+    'tired': 'уставший',
+    'hungry': 'голодный',
+    'thirsty': 'жаждущий',
+    'beautiful': 'красивый',
+    'ugly': 'уродливый',
+    'fast': 'быстрый',
+    'slow': 'медленный',
+    'easy': 'легкий',
+    'difficult': 'сложный',
+    'old': 'старый',
+    'new': 'новый',
+    'good': 'хороший',
+    'bad': 'плохой',
+    'interesting': 'интересный',
+    'boring': 'скучный',
+    'exciting': 'захватывающий',
+    'funny': 'смешной',
+    'serious': 'серьезный',
+    'surprised': 'удивленный',
+    'afraid': 'испуганный',
+    'brave': 'храбрый',
+    'strong': 'сильный',
+    'weak': 'слабый',
+    'healthy': 'здоровый',
+    'sick': 'больной',
     "apple": "яблоко",
     "banana": "банан",
     "cat": "кошка",
@@ -157,3 +230,16 @@ words_base = {
     3: hard
 }
 
+#todo: добавить обрезание перевода до одного слова
+def load_words_to_database():
+    with app.app_context():
+        for level, words in words_base.items():
+            for word, translate in words.items():
+                question = Question(level=level, question=word, answer=translate)
+                db.session.add(question)
+
+        db.session.commit()
+
+
+if __name__ == '__main__':
+    load_words_to_database()

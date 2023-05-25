@@ -1,7 +1,14 @@
+import pickle
+
 from flask_sqlalchemy import SQLAlchemy
 from config.app_config import app, db
 from datetime import datetime
 
+# Таблица-связка для определения отношений между объектами Session и Question
+questions_sessions = db.Table('questions_sessions',
+                              db.Column('session_id', db.Integer, db.ForeignKey('sessions.id'), primary_key=True),
+                              db.Column('question_id', db.Integer, db.ForeignKey('questions.id'), primary_key=True)
+                              )
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -15,14 +22,29 @@ class User(db.Model):
 
 
 class Session(db.Model):
-    __tablename__ = 'sesions'
+    __tablename__ = 'sessions'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.relationship(db.Integer, db.ForeignKey('users.id'))
-    questions = db.relationship('Question', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    questions = db.relationship('Question', secondary=questions_sessions, lazy='subquery',
+                                backref=db.backref('sessions', lazy=True))
+    current_answer_num = db.Column(db.Integer, default=0)
+    answers = db.Column(db.PickleType, nullable=True)
+
+    def set_answers_list(self, data):
+        self.answers = pickle.dumps(data)
+
+    def get_answers_list(self):
+        return pickle.loads(self.answers)
 
 
 class Question(db.Model):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
+    level = db.Column(db.Integer, nullable=False)
     question = db.Column(db.String(100), nullable=False)
     answer = db.Column(db.String(100), nullable=False)
+
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()

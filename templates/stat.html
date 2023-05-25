@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Статистика пользователя {{ user.username }}{% endblock %}
+{% block title %}Статистика пользователя {{ user.username }}, ID: {{ user.id }}{% endblock %}
 
 {% block body %}
     <div class="container">
         <h3 class="my-4">Статистика пользователя {{ user.username }}</h3>
         <dl class="row">
             <dt class="col-sm-3">Правильных ответов</dt>
-            <dd class="col-sm-9">{{ user.correct_answers }}
-                ({{ (user.correct_answers / user.questions | length * 100) | round }} %)
+            <dd class="col-sm-9">{{ correct_answers }}
+                ({{ (correct_answers / results | length * 100) | round }} %)
             </dd>
 
             <dt class="col-sm-3">Неправильных ответов</dt>
-            <dd class="col-sm-9">{{ user.questions | length - user.correct_answers }}</dd>
+            <dd class="col-sm-9">{{ incorrect_answers }}</dd>
         </dl>
         <h6 class="my-4">Таблица ответов:</h6>
         <table class="table">
@@ -25,7 +25,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for question, result in user.answers %}
+            {% for question, result in results %}
                 <tr>
                     <th scope="row">{{ loop.index }}</th>
                     <td>{{ question.question }}</td>

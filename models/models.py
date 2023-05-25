@@ -1,7 +1,3 @@
-# from flask_sqlalchemy import SQLAlchemy
-#
-# db: SQLAlchemy = SQLAlchemy(app)
-
 
 class Question:
     """
@@ -31,3 +27,5 @@ class UserSession():
         self.total_answers: int = 0
         self.correct_answers: int = 0
         self.questions: list[Question] = []
+
+
