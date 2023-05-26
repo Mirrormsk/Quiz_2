@@ -12,20 +12,6 @@ def get_random_id() -> int:
     return int(''.join(digits))
 
 
-#
-# def create_questions(questions: dict[str, str], qst_number=10) -> list[Question]:
-#     """
-#     Принимает на вход словарь с вопросами, и возвращает
-#     объект Question
-#     :param qst_number:
-#     :param questions:
-#     :return:
-#     """
-#     words = sample(list(questions.keys()), qst_number)
-#     user_questions = [Question(word, questions[word].split(',')[0]) for word in words]
-#     return user_questions
-
-
 def create_questions(diff_level: int, k: int = 10):
     """
     Функция для генерации списка вопросов

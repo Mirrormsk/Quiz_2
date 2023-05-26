@@ -119,6 +119,11 @@ def stat(id):  # Страница статистики
                            results=results, user_id=user.id)
 
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+
 if __name__ == '__main__':
     db.create_all()
     app.run()
