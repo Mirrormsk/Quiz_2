@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+
+{% block title %}{{ user.username }} - Личный кабинет{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <h1 id="tables">{{ user.username }}, ваши игровые сессии</h1>
+                </div>
+
+                <div class="bs-component">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Дата</th>
+                            <th scope="col">Сложность</th>
+                            <th scope="col">Правильных ответов / ошибок</th>
+                            <th scope="col">Процент правильных ответов</th>
+                            <th scope="col">Подробнее</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for session in sessions %}
+
+                            <tr class="table-light">
+                                <th scope="row">{{ session.date }}</th>
+                                <td>{{ session.level }}</td>
+                                <td>{{ session.correct_answers }} / {{ session.incorrect_answers }}</td>
+                                <td>{{ session.percent_of_correct_answers }} %</td>
+                                <td><a href="stat/{{ session.id }}">Посмотреть</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <a href="{{ url_for('index') }}">
+                        <button class="source-button btn btn-primary btn-xs" type="button" tabindex="0"><i
+                                class="bi bi-code"></i>На главную
+                        </button>
+                    </a>
+
+                </div><!-- /example -->
+            </div>
+        </div>
+    </div>
+{% endblock %}

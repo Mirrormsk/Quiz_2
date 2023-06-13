@@ -1,6 +1,7 @@
 import random
 from random import shuffle, sample
 from models.models_db import Question, User
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def get_random_id() -> int:
@@ -38,7 +39,7 @@ def choose_plural(amount: int, declensions: tuple) -> str:
     return f'{amount} {res}'
 
 
-def get_user_and_session(id_):
+def get_user_and_session(id_: int):
     """
     Возвращает объект юзера и последнюю сессию
     :param id_: int

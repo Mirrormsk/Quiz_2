@@ -235,7 +235,7 @@ def load_words_to_database():
     with app.app_context():
         for level, words in words_base.items():
             for word, translate in words.items():
-                question = Question(level=level, question=word, answer=translate)
+                question = Question(level=level, question=word, answer=translate.split(',')[0])
                 db.session.add(question)
 
         db.session.commit()

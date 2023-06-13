@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{#todo: дописать title#}
-{% block title %}{% endblock %}
+
+{% block title %}English Quiz - войти{% endblock %}
 
 {% block body %}
     <div class="container">
@@ -71,16 +71,17 @@
 
 
         <main class="form-signin w-50 m-auto">
-            <form action="/login">
-{#                <img class="mb-4" src="{{ url_for('static', filename='img/logo_with_man.png') }}" alt="" height="200">#}
+            <form action="/login" method="post">
+                {#                <img class="mb-4" src="{{ url_for('static', filename='img/logo_with_man.png') }}" alt="" height="200">#}
                 <h3 class="h3 my-5 fw-normal ">Введите данные, указанные при регистрации</h3>
 
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
+                           name="user_email">
                     <label for="floatingInput">Email</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="psw">
                     <label for="floatingPassword">Пароль</label>
                 </div>
 

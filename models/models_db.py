@@ -1,8 +1,9 @@
 import pickle
-
-from flask_sqlalchemy import SQLAlchemy
-from config.app_config import app, db
 from datetime import datetime
+
+from flask_login import UserMixin
+
+from config.app_config import app, db
 
 # Таблица-связка для определения отношений между объектами Session и Question
 questions_sessions = db.Table('questions_sessions',
@@ -10,10 +11,13 @@ questions_sessions = db.Table('questions_sessions',
                               db.Column('question_id', db.Integer, db.ForeignKey('questions.id'), primary_key=True)
                               )
 
-class User(db.Model):
+
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(100), nullable=False, default='Unknown User')
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    password = db.Column(db.String(100), nullable=False)
     date_of_registration = db.Column(db.DateTime, default=datetime.today())
     sessions = db.relationship('Session', backref='user', lazy=True)
 
@@ -29,6 +33,10 @@ class Session(db.Model):
                                 backref=db.backref('sessions', lazy=True))
     current_answer_num = db.Column(db.Integer, default=0)
     answers = db.Column(db.PickleType, nullable=True)
+    correct_answers = db.Column(db.Integer, nullable=False, default=0)
+    wrong_answers = db.Column(db.Integer, nullable=False, default=0)
+    date = db.Column(db.DateTime, default=datetime.today())
+    level = db.Column(db.Integer, nullable=False)
 
     def set_answers_list(self, data):
         self.answers = pickle.dumps(data)

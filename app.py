@@ -1,59 +1,59 @@
-from config.app_config import app, db
+from flask import request, render_template, redirect, jsonify, flash, url_for
+from flask_login import current_user, login_user, login_required, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from flask import request, render_template, redirect, jsonify
-
-from utils.utils import get_random_id, create_questions, choose_plural
-from static.data.user_sessions import user_sessions
-from models.models_db import User, Session, Question
+from config.app_config import app, db, login_manager
+from models.models_db import User, Session
+from models.user_login import UserLogin
+from utils.utils import get_random_id, create_questions, choose_plural, get_user_and_session
 
 
 @app.route('/', methods=['POST', 'GET'])
-def index():  # put application's code here
+def index():  # главная страница
     if request.method == 'POST':
         # Получаем пользовательские данные из формы
         # todo: Сделать валидацию введенных данных
         selected_level = int(request.form['diff_level'])
-        username = request.form['username']
-        user_id = get_random_id()
 
-        # Создаем экземпляр сесии с генерацией вопросов
+        user = current_user
+
+        # Создаем экземпляр сесcии с генерацией вопросов
         # todo: Запихнуть это в отдельную функцию и вынести в utils.py
         questions = create_questions(selected_level)
-        user_session = Session(user_id=user_id)
+        user_session = Session(user_id=user.id, level=selected_level)
         user_session.questions.extend(questions)
         user_session.set_answers_list([])
 
         # Создаем объект пользователя
-        user = User(id=user_id,
-                    username=username,
-                    )
+        # user = User(id=user_id,
+        #             username=username,
+        #             )
 
         db.session.add(user_session)
-        db.session.add(user)
+        # db.session.add(user)
         db.session.commit()
 
-        return redirect(f'/quiz/{user_id}')
+        return redirect(url_for('quiz'))
     else:
         return render_template('index.html')
 
 
-@app.route('/quiz/<int:id>', methods=['GET'])
-def quiz(id):  # put application's code here
-    user = User.query.get(id)
-    if user:
-        sorted_sessions = sorted(user.sessions, key=lambda session: session.id,
-                                 reverse=True)  # Сортировка сессий по полю 'id' в порядке убывания
-        if sorted_sessions:
-            session = sorted_sessions[0]  # Получение последней сессии
-            # Обработка последней сессии
-        else:
-            return f'У пользователя {User} пока нет сессий'
+@app.route('/quiz/', methods=['GET'])
+@login_required
+def quiz():  # put application's code here
+    user = current_user
+
+    sorted_sessions = sorted(user.sessions, key=lambda session: session.id,
+                             reverse=True)  # Сортировка сессий по полю 'id' в порядке убывания
+    if sorted_sessions:
+        session = sorted_sessions[0]  # Получение последней сессии
+        # Обработка последней сессии
     else:
-        return f'Пользователь с id {id} не найдет'
+        return f'У пользователя {User} пока нет сессий'
 
     # Если отвечены на все вопросы - перенаправление на статистику
     if session.current_answer_num == len(session.questions):
-        return redirect(f'/stat/{user.id}', )
+        return redirect(f'/stat/{session.id}' )
 
     questions = session.questions
 
@@ -67,24 +67,23 @@ def quiz(id):  # put application's code here
 
 @app.route('/check_answer', methods=['POST'])
 def check_answer():
-    user = User.query.get(int(request.form.get('user_id')))
-    if user:
-        sorted_sessions = sorted(user.sessions, key=lambda session: session.id,
-                                 reverse=True)  # Сортировка сессий по полю 'id' в порядке убывания
-        if sorted_sessions:
-            session = sorted_sessions[0]  # Получение последней сессии
-            # Обработка последней сессии
+    user = current_user
 
-        else:
-            return f'У пользователя {user} пока нет сессий'
+    sorted_sessions = sorted(user.sessions, key=lambda session: session.id,
+                             reverse=True)  # Сортировка сессий по полю 'id' в порядке убывания
+    if sorted_sessions:
+        session = sorted_sessions[0]  # Получение последней сессии
+        # Обработка последней сессии
     else:
-        return f'Пользователь с id {id} не найден'
+        return f'У пользователя {User} пока нет сессий'
 
     question = session.questions[session.current_answer_num]
     user_answer = request.form.get('user_answer').lower().strip()
     is_answer_correct = question.answer == user_answer
-    # if is_answer_correct:
-    #     user.correct_answers += 1
+    if is_answer_correct:
+        session.correct_answers += 1
+    else:
+        session.wrong_answers += 1
 
     session_answers = session.get_answers_list()
     session_answers.append((question, is_answer_correct))
@@ -97,19 +96,11 @@ def check_answer():
     return jsonify({'success': is_answer_correct})
 
 
-@app.route('/stat/<int:id>')
-def stat(id):  # Страница статистики
-    user = User.query.get(id)
-    if user:
-        sorted_sessions = sorted(user.sessions, key=lambda session: session.id,
-                                 reverse=True)  # Сортировка сессий по полю 'id' в порядке убывания
-        if sorted_sessions:
-            session = sorted_sessions[0]  # Получение последней сессии
-            # Обработка последней сессии
-        else:
-            return f'У пользователя {user} пока нет сессий'
-    else:
-        return f'Пользователь с id {id} не найден'
+@app.route('/stat/<int:session_id>')
+@login_required
+def stat(session_id):  # Страница статистики
+    user = current_user
+    session = Session.query.get(session_id)
 
     results = session.get_answers_list()
     correct_answers = len([res for qst, res in results if res])
@@ -119,9 +110,90 @@ def stat(id):  # Страница статистики
                            results=results, user_id=user.id)
 
 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(email=request.form['user_email']).first()
+        remember = True if request.form.get('remember') else False
+        if user and check_password_hash(user.password, request.form['psw']):
+            login_user(user, remember=remember)
+
+            flash('Вы успешно вошли')
+            return redirect(url_for('index'))
+        flash('Неверно введены логин или пароль', 'error')
+
     return render_template('login.html')
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        user_email = request.form.get('user_email')
+        user_password_1 = request.form.get('user_password_1')
+        user_password_2 = request.form.get('user_password_2')
+
+        if all(
+                map(lambda x: len(x) > 3,
+                    (username, user_email, user_password_1))) and user_password_1 == user_password_2 and all([username,
+                                                                                                              user_password_1,
+                                                                                                              user_password_2]):
+            hash_psw = generate_password_hash(user_password_1)
+            user = User(
+                username=username,
+                email=user_email,
+                password=hash_psw
+            )
+            try:
+                db.session.add(user)
+                db.session.commit()
+                flash(f'Вы успешно зарегистрировались, {username}')
+                return redirect(url_for('login'))
+            except:
+                flash(f'Ошибка регистрации', 'error')
+
+        else:
+            flash('Данные указаны неверно', 'error')
+
+    else:
+        return render_template('register.html', title='Регистрация')
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    print("load_user")
+    return User.query.get(user_id)
+
+
+@app.route('/profile')
+@login_required
+def profile():  # Страница статистикиe
+
+    sessions = []
+    for session in current_user.sessions:
+        results = session.get_answers_list()
+        correct_answers = len([res for qst, res in results if res])
+        incorrect_answers = len(results) - correct_answers
+        percent_of_correct_answers = round(correct_answers / len(results) * 100)
+
+        session_data = {
+            'id': session.id,
+            'level': session.level,
+            'date': session.date.strftime('%Y-%m-%d %H:%M'),
+            'correct_answers': correct_answers,
+            'incorrect_answers': incorrect_answers,
+            'percent_of_correct_answers': percent_of_correct_answers
+        }
+
+        sessions.append(session_data)
+    return render_template('profile.html', user=current_user, sessions=sessions )
 
 
 if __name__ == '__main__':

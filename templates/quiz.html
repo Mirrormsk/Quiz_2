@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block headeer_script %}
+{% block header_script %}
     <script src="{{ url_for('static', filename='js/check_answer.js') }} "></script>
 {% endblock %}
 {% block title %}Quiz - Вопрос {{ user_session.current_answer_num + 1 }} из {{ user_session.questions | length }} {% endblock %}
@@ -28,9 +28,9 @@
                     <h5 class="card-title" id="result_title">Special title treatment</h5>
                     <p class="card-text">{{ question.question.capitalize() }} - это {{ question.answer }}</p>
                     {% if user_session.current_answer_num + 1 != user_session.questions | length %}
-                        <a href="/quiz/{{ user.id }}" id="next_question" class="btn btn-primary">Следующий вопрос</a>
+                        <a href="{{ url_for('quiz') }}" id="next_question" class="btn btn-primary">Следующий вопрос</a>
                     {% else %}
-                        <a href="/quiz/{{ user.id }}" id="next_question" class="btn btn-primary">Закончить викторину</a>
+                        <a href="{{ url_for('quiz') }}" id="next_question" class="btn btn-primary">Закончить викторину</a>
                     {% endif %}
 
                 </div>
