@@ -10,6 +10,8 @@ from utils.utils import get_random_id, create_questions, choose_plural, get_user
 
 @app.route('/', methods=['POST', 'GET'])
 def index():  # главная страница
+    user = current_user
+
     if request.method == 'POST':
         # Получаем пользовательские данные из формы
         # todo: Сделать валидацию введенных данных
@@ -35,7 +37,7 @@ def index():  # главная страница
 
         return redirect(url_for('quiz'))
     else:
-        return render_template('index.html')
+        return render_template('index.html', user=current_user)
 
 
 @app.route('/quiz/', methods=['GET'])
@@ -196,6 +198,14 @@ def profile():  # Страница статистикиe
 
             sessions.append(session_data)
     return render_template('profile.html', user=current_user, sessions=sessions)
+
+
+@app.after_request
+def redirect_to_sign(response):
+    if response.status_code == 401:
+        return redirect(url_for('login'))
+
+    return response
 
 
 if __name__ == '__main__':
