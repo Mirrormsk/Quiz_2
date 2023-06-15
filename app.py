@@ -53,7 +53,7 @@ def quiz():  # put application's code here
 
     # Если отвечены на все вопросы - перенаправление на статистику
     if session.current_answer_num == len(session.questions):
-        return redirect(f'/stat/{session.id}' )
+        return redirect(f'/stat/{session.id}')
 
     questions = session.questions
 
@@ -179,21 +179,23 @@ def profile():  # Страница статистикиe
     sessions = []
     for session in current_user.sessions:
         results = session.get_answers_list()
-        correct_answers = len([res for qst, res in results if res])
-        incorrect_answers = len(results) - correct_answers
-        percent_of_correct_answers = round(correct_answers / len(results) * 100)
+        if results:
+            correct_answers = len([res for qst, res in results if res])
+            incorrect_answers = len(results) - correct_answers
+            percent_of_correct_answers = round(correct_answers / len(results) * 100)
+            difficulty_levels = ('Легкий', 'Средний', 'Тяжелый')
 
-        session_data = {
-            'id': session.id,
-            'level': session.level,
-            'date': session.date.strftime('%Y-%m-%d %H:%M'),
-            'correct_answers': correct_answers,
-            'incorrect_answers': incorrect_answers,
-            'percent_of_correct_answers': percent_of_correct_answers
-        }
+            session_data = {
+                'id': session.id,
+                'level': difficulty_levels[session.level - 1],
+                'date': session.date.strftime('%Y-%m-%d %H:%M'),
+                'correct_answers': correct_answers,
+                'incorrect_answers': incorrect_answers,
+                'percent_of_correct_answers': percent_of_correct_answers
+            }
 
-        sessions.append(session_data)
-    return render_template('profile.html', user=current_user, sessions=sessions )
+            sessions.append(session_data)
+    return render_template('profile.html', user=current_user, sessions=sessions)
 
 
 if __name__ == '__main__':
