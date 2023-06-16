@@ -1,7 +1,7 @@
 import random
-from random import shuffle, sample
+from random import shuffle
+
 from models.models_db import Question, User
-from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def get_random_id() -> int:

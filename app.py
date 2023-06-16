@@ -4,8 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from config.app_config import app, db, login_manager
 from models.models_db import User, Session
-from models.user_login import UserLogin
-from utils.utils import get_random_id, create_questions, choose_plural, get_user_and_session
+from utils.utils import create_questions, choose_plural
 
 
 @app.route('/', methods=['POST', 'GET'])

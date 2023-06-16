@@ -57,6 +57,8 @@ class Question(db.Model):
 
 
 class UserView(ModelView):
+    column_exclude_list = ['password', ]
+
     def is_accessible(self):
         return current_user.role == 'admin'
 
