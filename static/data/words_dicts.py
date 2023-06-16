@@ -230,7 +230,8 @@ words_base = {
     3: hard
 }
 
-#todo: добавить обрезание перевода до одного слова
+
+# Загрузка слов в базу данных
 def load_words_to_database():
     with app.app_context():
         for level, words in words_base.items():

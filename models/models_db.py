@@ -1,9 +1,10 @@
 import pickle
 from datetime import datetime
 
+from flask_admin.contrib.sqla import ModelView
 from flask_login import UserMixin
 
-from config.app_config import app, db
+from config.app_config import app, db, admin
 
 # Таблица-связка для определения отношений между объектами Session и Question
 questions_sessions = db.Table('questions_sessions',
@@ -20,6 +21,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     date_of_registration = db.Column(db.DateTime, default=datetime.today())
     sessions = db.relationship('Session', backref='user', lazy=True)
+    role = db.Column(db.String(30), nullable=False, default='user')
 
     def __repr__(self):
         return f'<User {self.id}'
@@ -52,6 +54,13 @@ class Question(db.Model):
     question = db.Column(db.String(100), nullable=False)
     answer = db.Column(db.String(100), nullable=False)
 
+
+class SessionView(ModelView):
+    column_exclude_list = ['answers', ]  # disable model deletion
+
+
+admin.add_view(ModelView(User, db.session))
+admin.add_view(SessionView(Session, db.session))
 
 if __name__ == '__main__':
     with app.app_context():

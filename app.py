@@ -107,7 +107,7 @@ def stat(session_id):  # Страница статистики
     results = session.get_answers_list()
     correct_answers = len([res for qst, res in results if res])
     incorrect_answers = len(results) - correct_answers
-    print(f'Пользователь {user.username}: правильных {correct_answers}, неправильных {incorrect_answers}')
+    # print(f'Пользователь {user.username}: правильных {correct_answers}, неправильных {incorrect_answers}')
     return render_template('stat.html', user=user, correct_answers=correct_answers, incorrect_answers=incorrect_answers,
                            results=results, user_id=user.id)
 
@@ -170,7 +170,7 @@ def register():
 
 @login_manager.user_loader
 def load_user(user_id):
-    print("load_user")
+    # print("load_user")
     return User.query.get(user_id)
 
 
