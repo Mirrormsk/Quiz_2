@@ -1,8 +1,9 @@
 import pickle
 from datetime import datetime
 
+from flask import redirect, url_for, request
 from flask_admin.contrib.sqla import ModelView
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 
 from config.app_config import app, db, admin
 
@@ -55,11 +56,20 @@ class Question(db.Model):
     answer = db.Column(db.String(100), nullable=False)
 
 
+class UserView(ModelView):
+    def is_accessible(self):
+        return current_user.role == 'admin'
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
 class SessionView(ModelView):
     column_exclude_list = ['answers', ]  # disable model deletion
 
 
-admin.add_view(ModelView(User, db.session))
+admin.add_view(UserView(User, db.session))
 admin.add_view(SessionView(Session, db.session))
 
 if __name__ == '__main__':
